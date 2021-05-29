@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/currentFragment"
+        android:title="Current"
+        android:icon="@drawable/ic_current"
+        />
+
+    <item
+        android:id="@+id/nextWeekFragment"
+        android:title="Next Week"
+        android:icon="@drawable/ic_next_week"
+        />
+
+    <item
+        android:id="@+id/pastDaysFragment"
+        android:title="Past Days"
+        android:icon="@drawable/ic_past_days"
+        />
+</menu>

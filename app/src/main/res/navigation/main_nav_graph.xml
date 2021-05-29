@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_nav_graph"
+    app:startDestination="@id/currentFragment">
+
+    <fragment
+        android:id="@+id/currentFragment"
+        android:name="com.weather.howstheweather.ui.CurrentFragment"
+        android:label="CurrentFragment" />
+    <fragment
+        android:id="@+id/nextWeekFragment"
+        android:name="com.weather.howstheweather.ui.NextWeekFragment"
+        android:label="NextWeekFragment" />
+    <fragment
+        android:id="@+id/pastDaysFragment"
+        android:name="com.weather.howstheweather.ui.PastDaysFragment"
+        android:label="PastDaysFragment" />
+</navigation>

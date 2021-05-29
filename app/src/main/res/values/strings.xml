@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HowsTheWeather</string>
+    <string name="my_weather_toolbar_title">My Weather</string>
 </resources>
