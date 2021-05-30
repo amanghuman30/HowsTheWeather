@@ -1,7 +1,10 @@
 package com.weather.howstheweather.repositories
 
-class WeatherRepository {
+import com.weather.howstheweather.api.ApiBuilder
 
-    //getCurrentWeather()
+class WeatherRepository() {
+
+    suspend fun getCurrentWeather( lat : Double, lng : Double) =
+        ApiBuilder.weatherApi.getCurrentWeather(lat.toString(), lng.toString())
 
 }
