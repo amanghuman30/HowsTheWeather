@@ -9,9 +9,9 @@ import retrofit2.http.Query
 interface WeatherApi {
 
     @GET("/data/2.5/weather")
-    fun getCurrentWeather(
+    suspend fun getCurrentWeather(
         @Query("lat") lat : String,
-        @Query("lng") lng : String,
+        @Query("lon") lng : String,
         @Query("appid") appId : String = BuildConfig.WEATHER_API_KEY
     ) : Response<CurrentWeatherModel>
 

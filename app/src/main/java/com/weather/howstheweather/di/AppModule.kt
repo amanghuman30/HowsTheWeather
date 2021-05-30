@@ -6,7 +6,6 @@ import com.weather.howstheweather.repositories.WeatherRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -17,8 +16,4 @@ object AppModule {
     @Provides
     @Singleton
     fun provideWeatherRepository() = WeatherRepository()
-
-    @Provides
-    @Singleton
-    fun provideLocationProvider(@ApplicationContext app : Application) = FusedLocationProviderClient(app)
 }

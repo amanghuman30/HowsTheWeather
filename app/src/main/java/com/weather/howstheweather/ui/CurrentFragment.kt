@@ -2,43 +2,73 @@ package com.weather.howstheweather.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.*
 import com.weather.howstheweather.R
+import com.weather.howstheweather.api.Resource
+import com.weather.howstheweather.models.CurrentWeatherModel
 import com.weather.howstheweather.util.Constants
 import com.weather.howstheweather.util.Utilities
 import com.weather.howstheweather.viewModels.MainWeatherViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_current.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
-import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class CurrentFragment : Fragment(R.layout.fragment_current), EasyPermissions.PermissionCallbacks{
 
     val weatherViewModel : MainWeatherViewModel by viewModels()
 
-    @Inject lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
         requestPermissions()
+
+        weatherViewModel.currentWeatherLiveData.observe(viewLifecycleOwner, { resource ->
+            when(resource) {
+                is Resource.Success -> {
+                    updateCurrentWeather(resource.data)
+                }
+                is Resource.Loading -> {
+
+                }
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(),getString(R.string.weather_api_error), Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+    }
+
+    private fun updateCurrentWeather(weather : CurrentWeatherModel?) {
+        weather?.let {
+            tvTemperature.text = weather.main?.temp?.toString()
+        }
     }
 
     private fun requestPermissions() {
-        if(Utilities.hasLocationPermission(requireContext()))
-            return
-
-        EasyPermissions.requestPermissions(this,
-            "Location Permission required for the app to function.",
-            Constants.PERMISSION_REQUEST_CODE,
-            Manifest.permission.ACCESS_COARSE_LOCATION)
+        if(Utilities.hasLocationPermission(requireContext())) {
+            requestLocationUpdates()
+        } else {
+            EasyPermissions.requestPermissions(
+                this,
+                "Location Permission required for the app to function.",
+                Constants.PERMISSION_REQUEST_CODE,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -69,13 +99,21 @@ class CurrentFragment : Fragment(R.layout.fragment_current), EasyPermissions.Per
             val request = LocationRequest.create().apply {
                 interval = Constants.LOCATION_UPDATE_INTERVAL
                 fastestInterval = Constants.FASTEST_LOCATION_INTERVAL
-                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
             }
             fusedLocationProviderClient.requestLocationUpdates(
                 request,
                 locationCallback,
                 Looper.getMainLooper()
             )
+            if(!Utilities.isLocationEnabled(requireContext())) {
+                Toast.makeText(requireContext(), "Please turn on" + " your location...", Toast.LENGTH_LONG)
+                    .show()
+                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                startActivity(intent)
+            } else {
+                Toast.makeText(requireContext(),"Retrieving location", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

@@ -13,7 +13,7 @@ import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class MainWeatherViewModel @Inject constructor( val weatherRepository: WeatherRepository) : ViewModel() {
+class MainWeatherViewModel @Inject constructor(val weatherRepository: WeatherRepository) : ViewModel() {
 
     val currentWeatherLiveData : MutableLiveData<Resource<CurrentWeatherModel>> = MutableLiveData()
 
@@ -22,8 +22,6 @@ class MainWeatherViewModel @Inject constructor( val weatherRepository: WeatherRe
             currentWeatherLiveData.postValue(Resource.Loading())
             val response = weatherRepository.getCurrentWeather(lat, lng)
             currentWeatherLiveData.postValue(handleCurrentWeatherResponse(response))
-
-
         }
     }
 
