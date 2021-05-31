@@ -1,16 +1,12 @@
 package com.weather.howstheweather.models
 
-data class CurrentWeatherModel(
-    val base: String?,
+data class WeatherOfTheDay(
     val clouds: Clouds?,
-    val cod: Int?,
-    val coord: Coord?,
     val dt: Int?,
-    val id: Int?,
+    val dt_txt: String?,
     val main: Main?,
-    val name: String,
+    val pop: Int?,
     val sys: Sys?,
-    val timezone: Int?,
     val visibility: Int?,
     val weather: List<Weather>?,
     val wind: Wind?

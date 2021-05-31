@@ -21,6 +21,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_current.*
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -39,12 +41,14 @@ class CurrentFragment : Fragment(R.layout.fragment_current), EasyPermissions.Per
         weatherViewModel.currentWeatherLiveData.observe(viewLifecycleOwner, { resource ->
             when(resource) {
                 is Resource.Success -> {
+                    progressBarCurrent.visibility = View.GONE
                     updateCurrentWeather(resource.data)
                 }
                 is Resource.Loading -> {
-
+                    progressBarCurrent.visibility = View.VISIBLE
                 }
                 is Resource.Error -> {
+                    progressBarCurrent.visibility = View.GONE
                     Toast.makeText(requireContext(),getString(R.string.weather_api_error), Toast.LENGTH_SHORT).show()
                 }
             }
@@ -53,7 +57,38 @@ class CurrentFragment : Fragment(R.layout.fragment_current), EasyPermissions.Per
 
     private fun updateCurrentWeather(weather : CurrentWeatherModel?) {
         weather?.let {
-            tvTemperature.text = weather.main?.temp?.toString()
+            var temp = "${weather.main?.temp?.toString()}ºC"
+            tvTemperature.text = temp
+
+            var dayTemp = "${weather.main?.temp_max?.toString()}ºC"
+            tvDay.text = dayTemp
+
+            var nightTemp = "${weather.main?.temp_min?.toString()}ºC"
+            tvNight.text = nightTemp
+
+            var tempFeelsLike = "Feels Like ${weather.main?.feels_like?.toString()}ºC"
+            tvTempFeelsLike.text = tempFeelsLike
+
+            weather.weather?.let {
+                if(it.size > 0) {
+                    val description = it[0].description
+                    tvCloudSunDescription.text = description
+                    if(description!= null && description.contains("cloud")) {
+                        ivCloudSun.setImageResource(R.drawable.ic_cloudy)
+                    } else if(description != null && description.contains("wind")) {
+                        ivCloudSun.setImageResource(R.drawable.ic_windy)
+                    } else {
+                        ivCloudSun.setImageResource(R.drawable.ic_day)
+                    }
+                }
+            }
+
+            tvLocation.text = weather.name
+
+            val calendar = Calendar.getInstance()
+            val dateFormat = SimpleDateFormat("EEE, MMM d");
+            val date = dateFormat.format(calendar.time);
+            tvDateTime.text = date
         }
     }
 
