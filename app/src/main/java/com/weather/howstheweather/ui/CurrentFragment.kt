@@ -26,17 +26,12 @@ import java.util.*
 
 
 @AndroidEntryPoint
-class CurrentFragment : Fragment(R.layout.fragment_current), EasyPermissions.PermissionCallbacks{
+class CurrentFragment : Fragment(R.layout.fragment_current){
 
     val weatherViewModel : MainWeatherViewModel by viewModels()
 
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
-        requestPermissions()
 
         weatherViewModel.currentWeatherLiveData.observe(viewLifecycleOwner, { resource ->
             when(resource) {
@@ -51,6 +46,13 @@ class CurrentFragment : Fragment(R.layout.fragment_current), EasyPermissions.Per
                     progressBarCurrent.visibility = View.GONE
                     Toast.makeText(requireContext(),getString(R.string.weather_api_error), Toast.LENGTH_SHORT).show()
                 }
+            }
+        })
+
+        val mainActivity = activity as MainActivity
+        mainActivity.userLocationLiveData.observe(viewLifecycleOwner, { location ->
+            location?.let {
+                weatherViewModel.getCurrentWeather(location.latitude, location.longitude)
             }
         })
     }
@@ -91,77 +93,4 @@ class CurrentFragment : Fragment(R.layout.fragment_current), EasyPermissions.Per
             tvDateTime.text = date
         }
     }
-
-    private fun requestPermissions() {
-        if(Utilities.hasLocationPermission(requireContext())) {
-            requestLocationUpdates()
-        } else {
-            EasyPermissions.requestPermissions(
-                this,
-                "Location Permission required for the app to function.",
-                Constants.PERMISSION_REQUEST_CODE,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
-    }
-
-    override fun onPermissionsGranted(requestCode: Int, perms: MutableList<String>) {
-        requestLocationUpdates()
-    }
-
-    override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
-        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
-            AppSettingsDialog.Builder(requireActivity()).build().show()
-        } else {
-            requestPermissions()
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    fun requestLocationUpdates() {
-        if(Utilities.hasLocationPermission(requireContext())) {
-            val request = LocationRequest.create().apply {
-                interval = Constants.LOCATION_UPDATE_INTERVAL
-                fastestInterval = Constants.FASTEST_LOCATION_INTERVAL
-                priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-            }
-            fusedLocationProviderClient.requestLocationUpdates(
-                request,
-                locationCallback,
-                Looper.getMainLooper()
-            )
-            if(!Utilities.isLocationEnabled(requireContext())) {
-                Toast.makeText(requireContext(), "Please turn on" + " your location...", Toast.LENGTH_LONG)
-                    .show()
-                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                startActivity(intent)
-            } else {
-                Toast.makeText(requireContext(),"Retrieving location", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    private val locationCallback = object : LocationCallback (){
-        override fun onLocationResult(locationResult: LocationResult) {
-            super.onLocationResult(locationResult)
-            locationResult.locations?.let { locations ->
-                for (location in locations) {
-                    weatherViewModel.getCurrentWeather(location.latitude, location.longitude)
-                }
-                fusedLocationProviderClient.removeLocationUpdates(this)
-            }
-        }
-    }
-
 }
