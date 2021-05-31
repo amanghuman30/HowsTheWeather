@@ -31,6 +31,6 @@ class MainWeatherViewModel @Inject constructor(val weatherRepository: WeatherRep
                 return Resource.Success(it)
             }
         }
-        return Resource.Error(response.message(),null)
+        return Resource.Error(response.message())
     }
 }

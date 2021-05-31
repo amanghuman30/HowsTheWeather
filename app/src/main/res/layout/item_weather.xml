@@ -8,7 +8,7 @@
     android:background="@color/white">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/ivWeatherItem"
         android:layout_width="60dp"
         android:layout_height="60dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +24,7 @@
         android:gravity="start"
         app:layout_constraintBottom_toTopOf="@+id/tvTempLowItem"
         app:layout_constraintEnd_toStartOf="@+id/tvDateItem"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/ivWeatherItem"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="spread" />
 
@@ -37,7 +37,7 @@
         android:gravity="start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tvTempDescriptionItem"
-        app:layout_constraintStart_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toEndOf="@+id/ivWeatherItem"
         app:layout_constraintTop_toBottomOf="@+id/tvTempHighItem" />
 
     <TextView
